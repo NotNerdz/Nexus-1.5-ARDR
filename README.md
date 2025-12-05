@@ -33,82 +33,39 @@ With your actual API key from OpenRouter.
 
 Usage
 # Interactive mode (default: high tier)
-npx tsx ARDR.ts
+`npx tsx ARDR.ts`
 # Specify tier
-npx tsx ARDR.ts --tier max
+`npx tsx ARDR.ts --tier max`
 # Enable debug output
-npx tsx ARDR.ts --tier high --debug
+`npx tsx ARDR.ts --tier high --debug`
 
 In-Session Commands
 Command	Description
 tier low|high|max	Switch reasoning tier
 debug	Toggle debug output
 exit or quit	End session
-Pipeline Architecture
-┌─────────────────────────────────────────────────────────────────┐
-│                         User Query                               │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  STAGE 0: Task Profiler                                          │
-│  • Classifies task type (code, math, writing, reasoning, etc.)  │
-│  • Estimates complexity and hallucination risk                   │
-│  • Allocates reasoning budget and selects branches               │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    │   Conversational?     │
-                    └───────────┬───────────┘
-                          Yes   │   No
-                    ┌───────────┘   └───────────┐
-                    ▼                           ▼
-            ┌───────────────┐    ┌─────────────────────────────────┐
-            │  Fast Path    │    │  STAGE A: Structured Decomposition│
-            │  (Direct)     │    │  • Symbolic Abstractor            │
-            └───────────────┘    │  • Invariant Reducer              │
-                                 │  • Formalizer                     │
-                                 └─────────────────────────────────┘
-                                                 │
-                                                 ▼
-                                 ┌─────────────────────────────────┐
-                                 │  STAGE B: Dendritic Branches     │
-                                 │  ┌─────┐ ┌─────┐ ┌─────┐        │
-                                 │  │Logic│ │World│ │Code │  ...   │
-                                 │  └─────┘ └─────┘ └─────┘        │
-                                 │  (Parallel execution + scratchpad)│
-                                 └─────────────────────────────────┘
-                                                 │
-                                                 ▼
-                                 ┌─────────────────────────────────┐
-                                 │  STAGE C: Verification Layer     │
-                                 │  • Counterexample generation     │
-                                 │  • Consistency scoring           │
-                                 │  • Uncertainty quantification    │
-                                 └─────────────────────────────────┘
-                                                 │
-                                    ┌────────────┴────────────┐
-                                    │  High Uncertainty?       │
-                                    │  Weak Branches?          │
-                                    └────────────┬────────────┘
-                                           Yes   │   No
-                                    ┌────────────┘   └────────────┐
-                                    ▼                             │
-                    ┌─────────────────────────────────┐           │
-                    │  STAGE D: Adaptive Recurrence    │           │
-                    │  • Generate targeted instructions │           │
-                    │  • Re-run weak branches          │           │
-                    │  • Loop until threshold met      │           │
-                    └─────────────────────────────────┘           │
-                                    │                             │
-                                    └──────────────┬──────────────┘
-                                                   ▼
-                                 ┌─────────────────────────────────┐
-                                 │  FINAL: Grand Synthesizer        │
-                                 │  • Compiles evidence ledger      │
-                                 │  • Chief model synthesizes       │
-                                 │  • Streaming response output     │
-                                 └─────────────────────────────────┘
+
+# PIPELINE ARCHITECTURE
+
+The pipeline starts with the User Query entering the system.
+
+**STAGE 0**: Task Profiler receives the query first. It classifies the task type (code, math, writing, reasoning, etc.), estimates complexity and hallucination risk, and allocates the reasoning budget by selecting which branches to activate.
+The system then checks: Is this conversational?
+
+If yes, it takes the Fast Path and responds directly without heavy reasoning.
+
+If no, it proceeds to STAGE A: Structured Decomposition. This stage runs three parallel processes: the Symbolic Abstractor extracts entities and relationships, the Invariant Reducer identifies what must remain true, and the Formalizer creates contracts and algorithm sketches.
+
+Next comes **STAGE B**: Dendritic Branches. Multiple specialized branches run in parallel: Logic, World, Code, Pattern, Adversarial, and others as needed. They all share a scratchpad to coordinate their findings.
+
+The outputs flow into **STAGE C**: Verification Layer. This stage attacks the hypotheses by generating counterexamples, scoring consistency across branches, and quantifying the overall uncertainty.
+
+The system then asks: Is uncertainty high? Are there weak branches?
+
+If yes, it enters **STAGE D**: Adaptive Recurrence. This stage generates targeted improvement instructions, re-runs the weak branches with that feedback, and loops until the uncertainty threshold is met or max depth is reached.
+
+If no (or after recurrence completes), everything flows to the **FINAL STAGE**: Grand Synthesizer. This compiles an evidence ledger from all branches, feeds it to the chief model, and streams the final response to the user.
+
 # MODEL CONFIGURATION
 
 **Branch Models**
