@@ -14,7 +14,7 @@ Tier System - Low (free), High, and Max tiers with different chief models
 Conversational Fast-Path - Skips heavy reasoning for casual chat
 Installation
 # Clone the repository
-git clone https://github.com/NotNerdz/Nexus-1.5-ARDR/edit/main/README.md
+git clone https://github.com/NotNerdz/Nexus-1.5-ARDR/
 cd ardr
 # Install dependencies
 npm install openai
